@@ -185,15 +185,6 @@ renombrar_todos_cellranger() {
         return 1
     fi
 
-    # Normalize line endings (remueve \r si vienen de Windows)
-    # y procesar con awk; awk maneja bien números decimales.
-    # Campos esperados por seqkit stats: file format type num_seqs sum_len min_len avg_len max_len
-
-    # Usamos awk para:
-    #  - saltar la cabecera (NR==1)
-    #  - extraer basefile (basename)
-    #  - decidir tipo (primero por patrón en el nombre, si no, por avg_len)
-    #  - generar y ejecutar mv solo si el archivo existe
     awk -v outdir="$output_dir" '
     BEGIN { OFS = ""; }
     NR==1 { next } # saltar header
