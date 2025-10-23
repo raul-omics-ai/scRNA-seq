@@ -1,7 +1,7 @@
 # 🧬 SRA Downloader for scRNA-seq
 
 **Author:** Raúl  
-**Version:** 1.0  
+**Version:** 2.0  
 **Language:** Bash  
 
 This Bash script automates the download and preprocessing of **single-cell RNA-seq** data from the **NCBI Sequence Read Archive (SRA)** using the **SRA Toolkit**.  
