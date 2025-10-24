@@ -29,6 +29,28 @@ It performs validation, timestamped logging, parallel compression, and optional 
 ```bash
 ./sra_downloader.sh -i accession_list.txt -o output_dir [-t threads]
 ```
+## 📘 Understanding FASTQ Files in scRNA-seq Downloads
+
+When downloading scRNA-seq data from the SRA (e.g., 10x Genomics datasets), each sample typically produces **three FASTQ files**: one for the cDNA reads, one for the cell barcodes + UMIs, and one for the index reads.
+
+### File conventions
+
+| File | Typical name | Contains | Description |
+|------|----------------|-----------|--------------|
+| **R1** | `_1.fastq.gz` | **Read 1** | Usually contains the **cell barcode** and **UMI** (*Unique Molecular Identifier*). These reads are short (≈ 26–28 bases). |
+| **R2** | `_2.fastq.gz` | **Read 2** | Contains the **transcript (cDNA)** sequence. This is the longer read (≈ 90–100 bases). |
+| **I1** | `_3.fastq.gz` (or sometimes `_I1.fastq.gz`) | **Index 1** | Contains the **sample index** sequence used for demultiplexing by the sequencer. Typically ~8 bases long. |
+
+### Quick summary (example)
+
+| Type | Represents | Typical length | Example in your case |
+|------|-------------|----------------|----------------------|
+| **R1** | Cell barcode + UMI | ~28 bp | `SRR15689044_1.fastq.gz` |
+| **R2** | cDNA / transcript | ~90 bp | `SRR15689044_2.fastq.gz` |
+| **I1** | Sample index | ~8 bp | `SRR15689044_3.fastq.gz` |
+
+After running this script, the files are automatically renamed to match the **Cell Ranger** naming convention:
+
 
 ### Parameters
 
