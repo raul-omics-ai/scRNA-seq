@@ -31,9 +31,9 @@ When downloading scRNA-seq data from the SRA (e.g., 10x Genomics datasets), each
 After running this script, the files are automatically renamed to match the **Cell Ranger** naming convention:
 
 ```bash
-SRR15689044_S1_L001_R1_001.fastq.gz
-SRR15689044_S1_L001_R2_001.fastq.gz
-SRR15689044_S1_L001_I1_001.fastq.gz
+SRR123456789_S1_L001_R1_001.fastq.gz
+SRR123456789_S1_L001_R2_001.fastq.gz
+SRR123456789_S1_L001_I1_001.fastq.gz
 ```
 This format allows the files to be used directly with the `cellranger count` command without any manual renaming.
 
