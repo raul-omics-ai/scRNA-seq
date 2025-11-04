@@ -100,6 +100,9 @@ cd /data/scRNAseq/
 fastq_data/
 ├── SRR12345678_S1_R1_L001_001.fastq.gz
 ├── SRR12345678_S1_R2_L001_001.fastq.gz
+├── SRR12345678_S1_I1_L001_001.fastq.gz
+├── SRR12345679_S1_R1_L001_001.fastq.gz
+├── SRR12345679_S1_R2_L001_001.fastq.gz
 ├── SRR12345679_S1_I1_L001_001.fastq.gz
 └── reads_stats.txt
 ```
