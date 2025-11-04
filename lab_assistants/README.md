@@ -47,7 +47,7 @@ This format allows the files to be used directly with the `cellranger count` com
 
   ```bash
   cd /path/to/my/project/
-  ./sra_downloader.sh -i accession_list.txt -o fastq_data
+  ./scrnaseq_data_download_sra_en.sh -i accession_list.txt -o fastq_data
   ```
 
 - Make sure you have sufficient disk space — single-cell datasets can be large (10–100 GB per sample).
