@@ -21,7 +21,7 @@ This repository contains two Bash scripts designed to streamline the processing 
 ### 1. `scRNAseq_SRA_Downloader.sh`
 Automates downloading, extracting, compressing, and renaming **FASTQ** files from **SRA** accessions, preparing them for use with **Cell Ranger**.
 
-### 2. `run_cellranger_count_v3.sh`
+### 2. `run_cellranger_count.sh`
 Executes **Cell Ranger `count`** on selected FASTQ samples, automatically handling resuming, logging, and output organization.
 
 ---
