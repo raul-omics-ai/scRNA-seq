@@ -33,7 +33,7 @@ This script automates the download of single-cell RNA-seq datasets from the **SR
 
 ### **Usage**
 ```bash
-bash scRNAseq_SRA_Downloader.sh -i accession_list.txt -o ./fastqs -t 16
+bash scrnaseq_data_download_sra_en.sh -i accession_list.txt -o ./fastqs -t 16
 ```
 
 ### **Options**
@@ -95,7 +95,7 @@ bash run_cellranger_count.sh -i ./fastqs -o ./results -t 8 -r /path/to/reference
 
 ```bash
 # 1️⃣ Download and prepare FASTQ files
-bash scRNAseq_SRA_Downloader.sh -i sra_list.txt -o ./fastqs -t 16
+bash scrnaseq_data_download_sra_en.sh -i sra_list.txt -o ./fastqs -t 16
 
 # 2️⃣ Create the sample list manually
 echo -e "SampleA\nSampleB\nSampleC" > samples.txt
