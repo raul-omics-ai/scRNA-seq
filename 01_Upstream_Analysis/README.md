@@ -1,4 +1,4 @@
-# 🧬 scRNA-seq Automation Scripts
+# 🧬 scRNA-seq Upstream Analysis Scripts
 
 This repository contains two Bash scripts designed to streamline the processing of single-cell RNA sequencing (scRNA-seq) data, from downloading raw SRA files to running the **Cell Ranger** pipeline.
 
