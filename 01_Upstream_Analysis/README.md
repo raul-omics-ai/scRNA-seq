@@ -135,7 +135,7 @@ fastq_data/
 
 ---
 
-## 🧫 Script 2: `run_cellranger_count_v3.sh`
+## 🧫 Script 2: `run_cellranger_count.sh`
 
 ### **Description**
 Automates running the **Cell Ranger** `count` command on multiple samples, moving only the `outs` directory to a specified output folder. Includes automatic resume support if interrupted.
@@ -205,12 +205,6 @@ results/
 - Stable internet connection (for SRA downloads)
 - Local filesystem (not external or network drives)
 
----
-
-## 🧠 License
-
-This project is released under the **MIT License**.
-Feel free to use, modify, and distribute with attribution.
 ---
 
 ## 🧠 License
