@@ -59,12 +59,12 @@ fi
 # -------------------------------
 # Environment setup
 # -------------------------------
-echo "📂 Input directory: $INPUT_DIR"
-echo "📦 Output directory: $OUTPUT_DIR"
-echo "🧬 Reference transcriptome: $REFERENCE"
-echo "📋 Sample list file: $SAMPLE_FILE"
-echo "🧵 Threads: $THREADS"
-echo "💾 Local memory: ${MEMORY}GB"
+echo "Input directory: $INPUT_DIR"
+echo "Output directory: $OUTPUT_DIR"
+echo "Reference transcriptome: $REFERENCE"
+echo "Sample list file: $SAMPLE_FILE"
+echo "Threads: $THREADS"
+echo "Local memory: ${MEMORY}GB"
 echo
 
 mkdir -p "$OUTPUT_DIR"
@@ -130,7 +130,7 @@ for SAMPLE in "${SAMPLES[@]}"; do
     # Move only the 'outs' folder to the final output directory
     if [[ -d "$SAMPLE/outs" ]]; then
         mv "$SAMPLE/outs" "$OUTPUT_DIR/$SAMPLE/"
-        echo "📁 Moved 'outs' folder for sample $SAMPLE → $OUTPUT_DIR/$SAMPLE/"
+        echo "Moved 'outs' folder for sample $SAMPLE → $OUTPUT_DIR/$SAMPLE/"
     else
         echo "⚠️  No 'outs' folder found for sample $SAMPLE. Skipping move."
         continue
