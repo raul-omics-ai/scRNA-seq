@@ -24,6 +24,9 @@ Automates downloading, extracting, compressing, and renaming **FASTQ** files fro
 ### 2. `run_cellranger_count.sh`
 Executes **Cell Ranger `count`** on selected FASTQ samples, automatically handling resuming, logging, and output organization.
 
+#### 3. `make_aggr_csv.sh`
+This script automatically generates the CSV file required by the **Cell Ranger `aggr`** command, based on the existing `molecule_info.h5` files produced in previous `cellranger count` runs.
+
 ---
 
 ## 📘 Understanding FASTQ Files in scRNA-seq Downloads
@@ -166,18 +169,83 @@ bash run_cellranger_count.sh -i ./fastqs -o ./results -t 8 -r /path/to/reference
 - Bash ≥ 4.0
 
 ---
+## 🧩 Script 3: `make_aggr_csv.sh`
+
+### **Description**
+
+It recursively searches through a base directory, identifies all `.h5` files, and builds a properly formatted CSV file that can be used directly in an aggregation step to combine multiple single-cell datasets into a single gene–cell matrix.
+
+---
+
+### **Usage**
+
+```bash
+./make_aggr_csv.sh -i <base_directory> -o <output_csv> [-m <mapping_file>]
+```
+
+### **Parameters**
+
+| Option | Description | Required | Default |
+|---------|-------------|-----------|----------|
+| `-i` | Base directory containing sample folders with `outs/molecule_info.h5` | ✅ | — |
+| `-o` | Output CSV file path | ✅ | — |
+| `-m` | Optional mapping file (`sample_id_real,sample_id_cellranger`) | ❌ | — |
+
+---
+
+### **Example**
+
+```bash
+./make_aggr_csv.sh \
+  -i /data/scRNAseq/results \
+  -o /data/scRNAseq/aggr/aggregated_samples.csv \
+  -m /data/scRNAseq/map_samples.csv
+```
+
+**Example mapping file (`map_samples.csv`):**
+```csv
+sample_id_real,sample_id_cellranger
+Sample1,SAMN123456777
+Sample2,SAMN123456788
+Sample3,SAMN123456789
+```
+
+**Resulting output (`aggregated_samples.csv`):**
+```csv
+sample_id,molecule_h5
+Sample1,/data/scRNAseq/results/SAMN123456777/outs/molecule_info.h5
+Sample2,/data/scRNAseq/results/SAMN123456788/outs/molecule_info.h5
+Sample3,/data/scRNAseq/results/SAMN123456789/outs/molecule_info.h5
+```
+
+---
+
+### **Features**
+
+- ✅ Automatically locates all `molecule_info.h5` files recursively  
+- ✅ Supports optional mapping to replace technical IDs with descriptive sample names  
+- ✅ Creates output directories automatically if missing  
+- ✅ Displays a summary of how many samples were found  
+- ✅ Bash ≥ 4 compatible (uses associative arrays)  
+
+---
 
 ## 📋 Example Workflow
 
+### **Example Workflow (Full Integration)**
+
 ```bash
-# 1️⃣ Download and prepare FASTQ files
+# 1️⃣ Download FASTQ files
 bash scrnaseq_data_download_sra_en.sh -i sra_list.txt -o ./fastqs -t 16
 
-# 2️⃣ Create the sample list manually
-echo -e "SampleA\nSampleB\nSampleC" > samples.txt
+# 2️⃣ Run Cell Ranger count
+bash run_cellranger_count.sh -i ./fastqs -o ./results -t 8 -r /refs/refdata-gex-GRCh38-2020-A -s samples.txt -m 64
 
-# 3️⃣ Run Cell Ranger count for selected samples
-bash run_cellranger_count_v3.sh -i ./fastqs -o ./results -t 8 -r /refs/refdata-gex-GRCh38-2020-A -s samples.txt -m 64
+# 3️⃣ Generate aggregation CSV for Cell Ranger aggr
+bash make_aggr_csv.sh -i ./results -o ./aggr/aggregated_samples.csv -m ./map_samples.csv
+
+# 4️⃣ Run Cell Ranger aggr
+cellranger aggr --id=aggregated_run --csv=./aggr/aggregated_samples.csv
 ```
 
 ---
@@ -188,13 +256,16 @@ After successful execution:
 
 ```
 results/
-├── SampleA/
-│   └── outs/
-├── SampleB/
-│   └── outs/
-└── ...
+├── sample1/outs/molecule_info.h5
+├── sample2/outs/molecule_info.h5
+├── sample3/outs/molecule_info.h5
+├── aggregated_samples.csv
+└── Aggr_Count_Mat/
+    └── outs/
+        ├── aggregation.csv
+        ├── web_summary.html
+        └── ...
 ```
-
 ---
 
 ## ⚙️ Recommended Environment
