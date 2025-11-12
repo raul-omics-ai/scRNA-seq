@@ -207,3 +207,4 @@ Esta gráfica además también nos permite distinguir aquellas células que tien
   
 }
 
+
