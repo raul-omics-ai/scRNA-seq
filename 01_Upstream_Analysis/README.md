@@ -24,7 +24,7 @@ Automates downloading, extracting, compressing, and renaming **FASTQ** files fro
 ### 2. `run_cellranger_count.sh`
 Executes **Cell Ranger `count`** on selected FASTQ samples, automatically handling resuming, logging, and output organization.
 
-### 3. `make_aggr_csv.sh`
+### 3. `make_aggr_csv.sh` (optional)
 This script automatically generates the CSV file required by the **Cell Ranger `aggr`** command, based on the existing `molecule_info.h5` files produced in previous `cellranger count` runs.
 
 ---
@@ -169,7 +169,7 @@ bash run_cellranger_count.sh -i ./fastqs -o ./results -t 8 -r /path/to/reference
 - Bash ≥ 4.0
 
 ---
-## 🧩 Script 3: `make_aggr_csv.sh`
+## 🧩 Script 3: `make_aggr_csv.sh` (optional for cellranger aggr)
 
 ### **Description**
 
