@@ -19,7 +19,7 @@
 #   - Distintos gráficos sobre la calidad de los datos de cada muestra de scRNA-seq
 
 
-quality_control_scRNA <- function(list_srn, where_to_save = NULL){
+automatic_qc_scrnaseq <- function(list_srn, where_to_save = NULL){
   print('Comenzando el análisis de control de calidad de los datos de scRNA-seq...')
   
   ########## FUNCIONES ##########
@@ -206,3 +206,4 @@ Esta gráfica además también nos permite distinguir aquellas células que tien
   return(list_srn)
   
 }
+
