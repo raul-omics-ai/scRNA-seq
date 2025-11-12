@@ -19,12 +19,21 @@
 #   - Distintos gráficos sobre la calidad de los datos de cada muestra de scRNA-seq
 
 
-automatic_qc_scrnaseq <- function(list_srn, where_to_save = NULL){
+automatic_qc_scrnaseq <- function(list_srn, 
+                                  where_to_save = NULL,
+                                  specie = "hsa"){
   print('Comenzando el análisis de control de calidad de los datos de scRNA-seq...')
   
   ########## FUNCIONES ##########
+  if(specie == "hsa"){
+    pat <- "^MT-"
+  }
+  if(specie == "mmu"){
+    pat = "^mt-"
+  }
+  
   percent_mito <- function(seurat_object){
-    seurat_object$mitoRatio <- PercentageFeatureSet(object = seurat_object, pattern = "^MT-")
+    seurat_object$mitoRatio <- PercentageFeatureSet(object = seurat_object, pattern = pat)
     seurat_object$mitoRatio <- seurat_object@meta.data$mitoRatio / 100
     return(seurat_object)
   }
@@ -206,5 +215,6 @@ Esta gráfica además también nos permite distinguir aquellas células que tien
   return(list_srn)
   
 }
+
 
 
