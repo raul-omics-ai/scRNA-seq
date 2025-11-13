@@ -1,11 +1,97 @@
 ########## 04/02/2025 ##########
 
-# ============================================ #
-# AUTOMATIC STANDAR SEURAT PROCESSING PIPELINE #
-# ============================================ #
-
-# This sript will be used for create a new function to perform the standar seurat pipeline for processing
-# scRNA-seq data.
+#' Automatic Standard Seurat Processing Pipeline
+#'
+#' @description
+#' The `automatic_standard_seurat()` function performs a complete and standardized
+#' Seurat-based preprocessing pipeline for single-cell RNA-seq (scRNA-seq) data.
+#' It applies normalization, feature selection, scaling, dimensionality reduction,
+#' cell cycle scoring (optional), and visualization steps to a list of Seurat objects.
+#' Results, plots, and reports are automatically saved in a dedicated directory.
+#'
+#' @param list_seurat A named list of Seurat objects, each representing one biological sample.
+#'   The list should contain objects already pre-filtered and containing basic QC metadata
+#'   (e.g. `nFeature_RNA`, `nCount_RNA`, `mitoRatio`, `log10GenesPerUMI`).
+#'
+#' @param where_to_save Character string. Path to the folder where the output directory
+#'   (`Standard_Seurat_Processing_YYYY-MM-DD/`) will be created.  
+#'   Default: `getwd()` (the current working directory).
+#'
+#' @param save_intermediate_files Logical. If `TRUE` (default), saves intermediate objects
+#'   (such as the processed Seurat list) to `.rds` files for reproducibility.
+#'
+#' @param specie Character. Species code to determine whether to perform cell cycle analysis.
+#'   Must be `"hsa"` for human data. Default: `"hsa"`.
+#'
+#' @param cell_cycle_analysis Logical. If `TRUE` (default) and `specie == "hsa"`,
+#'   performs cell cycle scoring using predefined S and G2/M gene sets.
+#'
+#' @details
+#' The pipeline consists of several sequential blocks:
+#'
+#' **1. Loading dependencies and preparing environment**  
+#'  - Checks and installs required CRAN packages (`ggplot2`, `Seurat`, `openxlsx`, etc.).  
+#'  - Loads custom helper scripts:
+#'    - `create_sequential_dir.R`: Creates sequentially numbered output directories.  
+#'    - `Automate_Saving_ggplots.R`: Automates saving of ggplot figures.  
+#'    - `automate_saving_dataframes_xlsx_format.R`: Saves data frames in Excel format.  
+#'    - `print_centered_note_v1.R`: Prints formatted console notes.
+#'
+#' **2. Standard Seurat preprocessing per sample**  
+#'  - Normalization via `NormalizeData()`  
+#'  - Highly variable gene selection (`FindVariableFeatures()`)  
+#'  - Data scaling (`ScaleData()`)  
+#'  - Principal component analysis (`RunPCA()`)
+#'  - Automatic PC selection via cumulative variance analysis  
+#'  - Elbow plots generated and saved per sample.
+#'
+#' **3. Source of variation analysis**  
+#'  - Adds categorical mitochondrial ratio bins (`percent_mito_CAT()`)  
+#'  - Optional: cell cycle phase scoring (S, G2/M) using `CellCycleScoring_edited.R`.
+#'
+#' **4. Non-linear dimensionality reduction**  
+#'  - Automatically selects number of PCs per sample.  
+#'  - Runs `RunUMAP()` and `RunTSNE()` accordingly.  
+#'  - Generates and saves a “Selected Dimensions Report”.
+#'
+#' **5. Visualization and reporting**  
+#'  - Generates `DimPlot()` visualizations for PCA, UMAP, and tSNE, grouped by `mitoFr`
+#'    and optionally `Phase` (cell cycle).  
+#'  - Combines plots across samples using `cowplot::plot_grid()` and saves them automatically.  
+#'  - Optionally saves the processed list of Seurat objects to disk.
+#'
+#' @return
+#' A list of processed Seurat objects, each containing:
+#'  - Normalized data  
+#'  - Variable features  
+#'  - PCA, UMAP, and tSNE reductions  
+#'  - Mitochondrial and (optionally) cell cycle annotations  
+#'  
+#' Additionally, the function creates a results directory containing:
+#'  - `ElbowPlot_*.png` figures  
+#'  - UMAP/tSNE visualizations grouped by cell cycle and mitoRatio  
+#'  - `Selected_Dimensions_Report.xlsx`  
+#'  - `Processed_Seurat_List.rds` (if `save_intermediate_files = TRUE`)
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage:
+#' processed_list <- automatic_standard_seurat(
+#'   list_seurat = list(sample1 = Seurat1, sample2 = Seurat2),
+#'   where_to_save = "~/Results/Seurat_Pipeline/",
+#'   specie = "hsa",
+#'   cell_cycle_analysis = TRUE
+#' )
+#' }
+#'
+#' @seealso
+#' [Seurat::NormalizeData()], [Seurat::RunPCA()], [Seurat::RunUMAP()],
+#' [Seurat::FindVariableFeatures()], [Seurat::ScaleData()], [CellCycleScoring()]
+#'
+#' @author
+#' Raúl — Bioinformatician
+#'
+#' @export
 
 automatic_standard_seurat <- function(SeuratObject, 
                                       where_to_save = NULL, 
