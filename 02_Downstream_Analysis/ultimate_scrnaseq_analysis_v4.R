@@ -40,7 +40,7 @@ automatic_scrnaseq_analysis <- function(SeuratObject, where_to_save = NULL,
   rm(list.of.packages, new.packages)
   
   # loading custom functions
-  source("~/Documentos/09_scripts_R/automatic_QC_scrnaseq_v1.R")
+  source("~/Documentos/09_scripts_R/automatic_QC_scrnaseq.R")
   source("~/Documentos/09_scripts_R/automate_standard_seurat_processing_v1.R")
   source("~/Documentos/09_scripts_R/automatic_doublet_detection_v1.R")
   source("~/Documentos/09_scripts_R/harmony_automate_integration_v1.R")
