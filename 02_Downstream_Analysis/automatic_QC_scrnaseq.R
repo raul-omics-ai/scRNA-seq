@@ -61,7 +61,7 @@
 #'   - `log10GenesPerUMI`: complexity metric
 #'
 #' - Creates an output directory named:
-#'   `"Quality_Control_<YYYY-MM-DD>"`, containing:
+#'   `"Quality_Control"`, containing:
 #'   \itemize{
 #'     \item `Combined_Metadata.xlsx` — combined metadata table
 #'     \item `Plot_Interpretation_Notes.xlsx` — interpretation guide for the QC plots
@@ -148,7 +148,7 @@ automatic_qc_scrnaseq <- function(list_srn,
   
   # Working directory
   where_to_save <- ifelse(is.null(where_to_save), ".", where_to_save)
-  results_folder <- create_sequential_dir(path = where_to_save, name = paste0("Quality_Control_", Sys.Date()))
+  results_folder <- create_sequential_dir(path = where_to_save, name = "Quality_Control")
 
   
   # Checkpoint: Check if all samples have the same number of columns in metadata
@@ -354,6 +354,7 @@ This graph also allows us to distinguish those cells that have a high number of 
   return(list_srn)
 
 }
+
 
 
 
