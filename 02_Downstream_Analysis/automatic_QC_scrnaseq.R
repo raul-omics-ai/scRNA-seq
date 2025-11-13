@@ -215,7 +215,7 @@ This graph also allows us to distinguish those cells that have a high number of 
   individual_images_dir <- create_sequential_dir(path = results_folder, name = "Individual_Figures")
 
   ########## CELLS PER SAMPLE ##########
-  cat('1...Cells per sample')
+  cat('\n1...Cells per sample\n')
   
   cells_per_sample <- combined_metadata %>%
     ggplot(aes(x = orig.ident, fill = orig.ident))+
@@ -232,7 +232,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               width = 2500, height = 3000)
   
   ########## UMI COUNTS PER CELL ##########
-  cat('2...UMIs per cell')
+  cat('\n2...UMIs per cell\n')
   umi_per_cell <- combined_metadata %>% 
     ggplot(aes(color=orig.ident, x=nCount_RNA, fill= orig.ident)) + 
     geom_density(alpha = 0.2) + 
@@ -250,7 +250,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               folder = individual_images_dir, width = 2500, height = 3000)
     
   ########## GENES DETECTED PER CELL ##########
-  cat('3...Genes detected per cell (density plot)')
+  cat('\n3...Genes detected per cell (density plot)\n')
   Genes_per_cell <- combined_metadata %>% 
     ggplot(aes(color=orig.ident, x=nFeature_RNA, fill= orig.ident)) + 
     geom_density(alpha = 0.2) + 
@@ -267,7 +267,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               width = 3000, height = 3000)
   
   # Visualize the distribution of genes detected per cell via boxplot
-  cat('4...Genes detected per cell (boxplot)')
+  cat('\n4...Genes detected per cell (boxplot)\n')
   boxplot_genes_per_cell <- combined_metadata %>% 
     ggplot(aes(x=orig.ident, y=log10(nFeature_RNA), fill=orig.ident)) + 
     geom_boxplot() + 
@@ -283,7 +283,7 @@ This graph also allows us to distinguish those cells that have a high number of 
                  folder = individual_images_dir, width = 3000, height = 3000)
     
   ########## UMIS vs GENES DETECTED ##########
-  cat('5...UMIs vs Genes detected')
+  cat('\n5...UMIs vs Genes detected\n')
   umis_vs_genes <- combined_metadata %>% 
                      ggplot(aes(x=nCount_RNA, y=nFeature_RNA, color=mitoRatio)) + 
                      geom_point() + 
@@ -304,7 +304,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               width = 3000, height = 3000)
   
   ########## MITOCONDRIAL COUNTS RATIO ##########
-  cat('6...Mitocondrial ratio')
+  cat('\n6...Mitocondrial ratio\n')
   mito_ratio_plot <- combined_metadata %>% 
     ggplot(aes(color=orig.ident, x=mitoRatio, fill=orig.ident)) + 
     geom_density(alpha = 0.2) + 
@@ -320,7 +320,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               width = 3000, height = 3000)
   
   ########## COMPLEXITY ##########
-  cat('7...Complexity')
+  cat('\n7...Complexity\n')
   complexity <- combined_metadata %>%
     ggplot(aes(x=log10GenesPerUMI, color = orig.ident, fill=orig.ident)) +
     geom_density(alpha = 0.2) +
@@ -334,7 +334,7 @@ This graph also allows us to distinguish those cells that have a high number of 
               width = 3000, height = 3000)
 
   ########## COMBINED PLOT ##########
-  cat('8...Combined Figure')
+  cat('\n8...Combined Figure\n')
   stack1 <- (cells_per_sample / boxplot_genes_per_cell) | 
     (umi_per_cell / Genes_per_cell / mito_ratio_plot / complexity) | umis_vs_genes
   
@@ -354,6 +354,7 @@ This graph also allows us to distinguish those cells that have a high number of 
   return(list_srn)
 
 }
+
 
 
 
