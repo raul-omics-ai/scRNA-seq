@@ -20,6 +20,7 @@
 automatic_scrnaseq_analysis <- function(SeuratObject, where_to_save = NULL,
                                         cell_cycle_analysis = TRUE, 
                                         title = "scRNAseq_Analysis", 
+                                        specie = "hsa",
                                         doublet_detection = TRUE,
                                         integration = TRUE, 
                                         save_intermediates_files = TRUE,
@@ -53,7 +54,7 @@ automatic_scrnaseq_analysis <- function(SeuratObject, where_to_save = NULL,
   dir.create(main_directory, recursive = T, showWarnings = F)
   
   # BLOCK 2: INITIAL QC ====
-  SeuratObject <- automatic_qc_scrnaseq(SeuratObject = SeuratObject, where_to_save = main_directory)
+  SeuratObject <- automatic_qc_scrnaseq(SeuratObject = SeuratObject, where_to_save = main_directory, specie = specie)
   
   # BLOCK 3: FILTERING ====
   separator <- paste0(rep("-", 80), collapse = "")
