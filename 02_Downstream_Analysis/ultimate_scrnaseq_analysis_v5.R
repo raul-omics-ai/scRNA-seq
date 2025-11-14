@@ -60,9 +60,9 @@ automatic_scrnaseq_analysis <- function(list_scr,
                                           name = paste0(title, "_", Sys.Date()))
 
   
- # ========================================== #
-  # === BLOCK 2: INITIAL Quality Control ====
-  # ========================================= #
+  # ========================================== #
+  # ==== BLOCK 2: INITIAL Quality Control ====
+  # ========================================== #
   list_scr <- automatic_qc_scrnaseq(list_srn = list_scr, 
                                     where_to_save = main_directory, 
                                     specie = specie)
@@ -194,15 +194,17 @@ automatic_scrnaseq_analysis <- function(list_scr,
   # =========================================== #
   # ==== BLOCK 3: STANDARD SEURAT PIPELINE ====
   # =========================================== #
-  SeuratObject <- automatic_standard_seurat(SeuratObject = SeuratObject, 
-                                            where_to_save = file.path(main_directory), 
-                                            save_intermediate_files = save_intermediates_files, 
+  list_scr <- automatic_standard_seurat(list_seurat = list_scr, 
+                                            where_to_save = main_directory, 
+                                            save_intermediate_files = save_intermediates_files,
+                                            specie = specie,
                                             cell_cycle_analysis = cell_cycle_analysis)
-  
-  # BLOCK 4: DOUBLET DETECTION ====
+  # ==================================== #
+  # ==== BLOCK 4: DOUBLET DETECTION ====
+  # ==================================== #
   if(doublet_detection){
-    SeuratObject <- automatic_doublet_detection(SeuratObject = SeuratObject, 
-                                                where_to_save = file.path(main_directory), 
+    list_scr <- automatic_doublet_detection(list_seurat = list_scr, 
+                                                where_to_save = main_directory, 
                                                 save_intermediates = save_intermediates_files)
   }
   
