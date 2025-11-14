@@ -44,10 +44,11 @@ automatic_scrnaseq_analysis <- function(list_scr,
   
   # loading custom functions
   source("~/Documentos/09_scripts_R/automatic_QC_scrnaseq.R")
-  source("~/Documentos/09_scripts_R/automate_standard_seurat_processing_v1.R")
-  source("~/Documentos/09_scripts_R/automatic_doublet_detection_v1.R")
+  source("~/Documentos/09_scripts_R/automate_standard_seurat_processing.R")
+  source("~/Documentos/09_scripts_R/automatic_doublet_detection.R")
   source("~/Documentos/09_scripts_R/harmony_automate_integration_v1.R")
   source("~/Documentos/09_scripts_R/automatic_clustering_scrnaseq_v1.R")
+  
   source("~/Documentos/09_scripts_R/print_centered_note_v1.R")
   source("~/Documentos/09_scripts_R/automate_saving_dataframes_xlsx_format.R")
   source("~/Documentos/09_scripts_R/Automate_Saving_ggplots.R")
