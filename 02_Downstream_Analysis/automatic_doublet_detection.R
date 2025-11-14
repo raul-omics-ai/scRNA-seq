@@ -283,6 +283,8 @@ automatic_doublet_detection <- function(list_seurat,
     print("Removing Doublets from the dataset")
     seu_sample <- subset(seu_sample,
                          subset = doublet_finder == 'Singlet')
+
+    list_seurat[[i]] <- seu_sample
     }# Key for for loop
   
   print("Saving DoubletFinder Report")
