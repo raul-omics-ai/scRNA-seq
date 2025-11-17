@@ -212,8 +212,8 @@ automatic_scrnaseq_analysis <- function(list_scr,
   
   # BLOCK 5: INTEGRATION STUTDY ====
   if(integration){
-    SeuratObject <- harmony_automate_integration(SeuratObject = SeuratObject, 
-                                                 where_to_save = file.path(main_directory), 
+    SeuratObject <- harmony_automate_integration(list_seurat = list_scr, 
+                                                 where_to_save = main_directory, 
                                                  save_intermediates = save_intermediates_files)
   }
   
