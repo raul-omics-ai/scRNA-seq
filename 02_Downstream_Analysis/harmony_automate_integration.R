@@ -1,7 +1,66 @@
 ########## 20/01/2025 ##########
 
-## Script automatizado para el análisis de integración con harmony de un objeto Seurat:
-
+#' @title Automated Integration of Seurat Objects Using Harmony
+#'
+#' @description
+#' This function performs a complete automated workflow to integrate multiple
+#' Seurat objects using the **Harmony** algorithm.  
+#' It includes: installation/loading of required packages, normalization,
+#' variable feature selection, PCA, automatic determination of the number of
+#' PCs to integrate, generation of plots (elbowplots, pre/post-integration UMAP),
+#' execution of Harmony, clustering, and optional saving of intermediate results.  
+#' All outputs (plots, RDS files, etc.) are stored in an automatically generated
+#' sequential directory.
+#'
+#' @param list_seurat A list of Seurat objects to be integrated.  
+#' Each element must be a valid Seurat object, and the list should be named
+#' because the names are used as \code{cell.ids} during merging.
+#'
+#' @param where_to_save Path where results will be saved.  
+#' If \code{NULL} (default), the current working directory is used.
+#'
+#' @param save_intermediates Logical.  
+#' If \code{TRUE} (default), the integrated Seurat object is saved as an RDS file
+#' and subsequently reloaded.
+#'
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item Installs and loads necessary packages.
+#'   \item Imports custom helper functions required by the pipeline.
+#'   \item Creates a directory to store all results.
+#'   \item Merges the input Seurat objects.
+#'   \item Normalizes data, selects variable features, scales, and runs PCA.
+#'   \item Automatically determines the optimal number of PCs using a heuristic
+#'         elbowplot approach.
+#'   \item Executes UMAP prior to integration.
+#'   \item Runs Harmony to integrate datasets by \code{orig.ident}.
+#'   \item Runs UMAP, FindNeighbors, and FindClusters on the integrated reduction.
+#'   \item Generates and saves pre- and post-integration visualizations.
+#'   \item Optionally saves the integrated object and performs memory cleanup.
+#' }
+#'
+#' @return A Seurat object integrated using Harmony, containing the \code{harmony}
+#' reduction, UMAP embeddings, and clustering based on the integrated dimensions.  
+#' Multiple figures and files are also written into the output directory.
+#'
+#' @seealso
+#' \code{\link[Seurat]{RunHarmony}},  
+#' \code{\link[Seurat]{NormalizeData}},  
+#' \code{\link[Seurat]{FindVariableFeatures}},  
+#' \code{\link[Seurat]{RunUMAP}},  
+#' \code{\link[Seurat]{FindClusters}}
+#'
+#' @examples
+#' \dontrun{
+#' integrated_seurat <- harmony_automate_integration(
+#'     list_seurat = list(sample1 = seurat1, sample2 = seurat2),
+#'     where_to_save = "results/",
+#'     save_intermediates = TRUE
+#' )
+#' }
+#'
+#' @export
 harmony_automate_integration <- function(list_seurat, 
                                          where_to_save = NULL, 
                                          save_intermediates = T) {
