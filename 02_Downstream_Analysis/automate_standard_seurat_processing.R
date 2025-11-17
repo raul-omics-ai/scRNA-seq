@@ -97,11 +97,14 @@ automatic_standard_seurat <- function(SeuratObject,
                                       where_to_save = NULL, 
                                       save_intermediate_files = T,
                                       cell_cycle_analysis = T){
-  # BLOCK 1: LOADING LIBRARIES, CUSTOM FUNCTIONS AND CREATING NEW DIRECTORIES ####
+
+  # =================================================================================== #
+  # ==== BLOCK 1: LOADING LIBRARIES, CUSTOM FUNCTIONS AND CREATING NEW DIRECTORIES ====
+  # =================================================================================== #
   # installing packages 
   print('Instalando los paquetes necesarios para el análisis...')
   list.of.packages = c('ggplot2', 'Seurat', 'SeuratObject','openxlsx', 'parallel', 
-                       'DoubletFinder', 'harmony', 'dplyr', 'cowplot', "patchwork")
+                       'dplyr', 'cowplot', "patchwork")
   
   new.packages = list.of.packages[!(list.of.packages %in% installed.packages())]
   if(length(new.packages) > 0) install.packages(new.packages)
@@ -110,14 +113,16 @@ automatic_standard_seurat <- function(SeuratObject,
   rm(list.of.packages, new.packages)
   
   # creating the saving directory
-  if(is.null(where_to_save)){
-    where_to_save <- getwd()
-  }
+  where_to_save = ifelse(is.null(where_to_save), getwd(), where_to_save)
   
-  saving_directory <- file.path(where_to_save, "03_STANDARD_PROCESSING")
-  dir.create(saving_directory, recursive = T, showWarnings = F)
-  
+  saving_directory <- create_sequential_dir(where_to_save, name = "Standard_Seurat_Processing")
+    
   # custom functions
+  source("~/Documentos/09_scripts_R/create_sequential_dir.R")
+  source("~/Documentos/09_scripts_R/Automate_Saving_ggplots.R")
+  source("~/Documentos/09_scripts_R/automate_saving_dataframes_xlsx_format.R")
+  source("~/Documentos/09_scripts_R/print_centered_note_v1.R")
+  
   percent_mito_CAT <- function(seurat_object) {
     # Calcular los cuantiles
     mito_breaks <- quantile(
@@ -142,22 +147,17 @@ automatic_standard_seurat <- function(SeuratObject,
     
     return(seurat_object)
   } # Key of the percentmito function
+
+  # ========================================================== #
+  # ==== BLOCK 2: Split Each Biological Sample To Analyze ====
+  # ========================================================== #
+  print_centered_note("Starting standard seurat processing")  separator <- paste0(rep("-", 80), collapse = "")
   
-  # header
-  separator <- paste0(rep("-", 80), collapse = "")
-  cat("\n")
-  print(separator)
-  print("                 STARTING WITH THE STANDARD PIPELINE OF SEURAT                  ")
-  print(separator)
+  rint_centered_note("Starting standard seurat processing")
   
-  # BLOCK 2: SPLIT EACH  BIOLOGICAL SAMPLE TO ANALYZE ####
-  print("Splitting Seurat Object to analyze each biological sample individually")
-  SeuratList <- SplitObject(SeuratObject, split.by = "orig.ident")
-  
-  print("Starting the standard pipeline of Seurat for each biological sample")
-  SeuratList <- lapply(SeuratList, function(x){NormalizeData(x)})
+  list_seurat <- lapply(list_seurat, function(x){NormalizeData(x)})
   print('NormalizeData OK')
-  SeuratList <- lapply(SeuratList, function(x){
+  list_seurat <- lapply(list_seurat, function(x){
     FindVariableFeatures(x,
                          selection.method = "vst",
                          nfeatures = 2000,
@@ -165,14 +165,14 @@ automatic_standard_seurat <- function(SeuratObject,
     
   })
   print('FindVariableFeatures OK')
-  SeuratList <- lapply(SeuratList, function(x){ScaleData(x)})
+  list_seurat <- lapply(list_seurat, function(x){ScaleData(x)})
   print("ScaleData OK")
-  SeuratList <- lapply(SeuratList, function(x){RunPCA(x)})
+  list_seurat <- lapply(list_seurat, function(x){RunPCA(x)})
   print("RunPCA OK")
-  print("Calculando los elbow plots...")
+  print("Creating Elbow Plots")
   
   # Calculo automático de las dimensiones a utilizar
-  lapply(SeuratList, function(x){
+  lapply(list_seurat, function(x){
     # Determine percent of variation associated with each PC
     pct <- x[["pca"]]@stdev / sum(x[["pca"]]@stdev) * 100
     # Calculate cumulative percents for each PC
@@ -189,24 +189,31 @@ automatic_standard_seurat <- function(SeuratObject,
                           rank = 1:length(pct))
     
     # Elbow plot to visualize 
-    png(filename = file.path(saving_directory, paste0("Elbowplot_Sample_", unique(x@meta.data$orig.ident), ".png")), res = 300, width = 2000, height = 2000)
-    print(ggplot(plot_df, aes(cumu, pct, label = rank, color = rank > pcs)) + 
-            geom_text() + 
-            geom_vline(xintercept = 90, color = "grey") + 
-            geom_hline(yintercept = min(pct[pct > 5]), color = "grey") +
-            theme_bw())
-    dev.off()
+    elbowplot <- ggplot(plot_df, aes(cumu, pct, label = rank, color = rank > pcs)) + 
+      geom_text() + 
+      geom_vline(xintercept = 90, color = "grey") + 
+      geom_hline(yintercept = min(pct[pct > 5]), color = "grey") +
+      theme_bw()
+    
+    save_ggplot(plot = elbowplot, 
+                folder = saving_directory,
+                title = paste0("ElbowPlot_Sample_", unique(x@meta.data$orig.ident)),
+                width = 2000, height = 2000)
+    
   })
-  
-  # BLOCK 3: SOURCES OF VARIATION FOR SEURAT LIST ####
+
+  # ======================================================= #
+  # ==== BLOCK 3: SOURCES OF VARIATION FOR SEURAT LIST ====
+  # ======================================================= #
+  print_centered_note("Starting analysis unwanted sources of variation")
   # MitoPercent
-  print('Starting analysis for percent mito')
+  print('Percent of mitochondrial damage')
   
   # Aplicar la función a la lista de objetos Seurat
-  SeuratList <- lapply(SeuratList, percent_mito_CAT)
+  list_seurat <- lapply(list_seurat, percent_mito_CAT)
   
   # CellCycle
-  if(cell_cycle_analysis){
+  if(specie == "hsa" & cell_cycle_analysis){
       print('Starting Cell Cycle analysis')
       # cell cycle markers
       
@@ -230,24 +237,27 @@ automatic_standard_seurat <- function(SeuratObject,
                      "UBE2C",   "CKAP5",   "AURKB",   "CDCA2",   "TUBB4B",  "JPT1")
       
       source("~/Documentos/09_scripts_R/CellCycleScoring_edited.R")
-      SeuratList <- lapply(SeuratList, function(x){
+      list_seurat <- lapply(list_seurat, function(x){
         CellCycleScoring_edited(x, 
                                 g2m.features = g2m_genes, 
                                 s.features = s_genes)
       })
       print('CellCycleScoring OK')
     } # if cell cycle analysis key
+
+  # ====================================================================== #
+  # ==== BLOCK 4: NON-LINEAR DIMENSIONALITY REDUCTION FOR SEURAT LIST ====
+  # ====================================================================== #
+  print_centered_note('Starting with Non-Linear Dimensionality Reduction Step')
   
-  # BLOCK 4: NON-LINEAR DIMENSIONALITY REDUCTION FOR SEURAT LIST ####
-  print('Starting non-linear dimensionality reduction for seurat')
   save_dims_per_sample <- c()
   dimensions_report <- data.frame(matrix(nrow=0,ncol=2))
   colnames(dimensions_report) = c('Sample', 'Number of PC')
   
-  for(sample in 1:length(SeuratList)){
-    print(paste0("Computing PCs for sample ", names(SeuratList)[sample]))
+  for(sample in 1:length(list_seurat)){
+    print(paste0("Computing PCs for sample ", names(list_seurat)[sample]))
     # Calculo automático de las dimensiones a utilizar
-    pct <- SeuratList[[sample]][["pca"]]@stdev / sum(SeuratList[[sample]][["pca"]]@stdev) * 100
+    pct <- list_seurat[[sample]][["pca"]]@stdev / sum(list_seurat[[sample]][["pca"]]@stdev) * 100
     # Calculate cumulative percents for each PC
     cumu <- cumsum(pct)
     # Determine which PC exhibits cumulative percent greater than 90% and % variation associated with the PC as less than 5
@@ -257,26 +267,31 @@ automatic_standard_seurat <- function(SeuratObject,
     pcs <- min(co1, co2)
     dims_per_sample <- pcs
     save_dims_per_sample <- c(save_dims_per_sample, dims_per_sample)
-    print(paste0('A total of  ', pcs, ' were selected for UMAP and TSNE'))
-    SeuratList[[sample]] <- RunUMAP(SeuratList[[sample]], dims = 1:dims_per_sample)
+    print(paste0('A total of ', pcs, ' PCs were selected for UMAP and TSNE'))
+    list_seurat[[sample]] <- RunUMAP(list_seurat[[sample]], dims = 1:dims_per_sample)
     print('RunUMAP OK')
-    SeuratList[[sample]] <- RunTSNE(SeuratList[[sample]], dims = 1:dims_per_sample)
+    list_seurat[[sample]] <- RunTSNE(list_seurat[[sample]], dims = 1:dims_per_sample)
     print('RunTSNE OK')
     
-    dimensions_report[sample,1] = names(SeuratList)[sample]
+    dimensions_report[sample,1] = names(list_seurat)[sample]
     dimensions_report[sample,2] = dims_per_sample
   } # for loop for computing PCs, UMAP and plots key
-  write.xlsx(dimensions_report, file = file.path(saving_directory, "Selected_Dimensions_Report.xlsx"), overwrite = T)
   
-  # BLOCK 5: VISUALIZATIONS
-  print("Creating Visualizations about Sources of Variation")
-  num_samples <- length(SeuratList)
+  save_dataframe(df = dimensions_report, 
+                 title = "Selected_Dimensions_Report", 
+                 folder = saving_directory)
+
+  # ================================ #
+  # === BLOCK 5: VISUALIZATIONS ====
+  # ================================ #
+  print_centered_note("Creating Visualizations About Sources of Variation")
+  num_samples <- length(list_seurat)
   
   i <- 1
+  groups <- ifelse(cell_cycle_analysis & specie == "hsa", c("Phase", "mitoFr"), "mitoFr")
   for (reduction in c("pca", "umap", "tsne")) {
-    for (group in c("Phase", "mitoFr")) {
-      title <- sprintf("%02d_%s_%s_All_Samples.png", i, toupper(reduction), group)
-      plotlist <- lapply(SeuratList, function(x) {
+    for (group in groups) {
+      plotlist <- lapply(list_seurat, function(x) {
         DimPlot(x, reduction = reduction, group.by = group) + ggtitle(x$orig.ident)
       })
       
@@ -289,34 +304,27 @@ automatic_standard_seurat <- function(SeuratObject,
         3
       }
       
-      png(filename = file.path(saving_directory, title), res = 300, width = 2000, height = 2000)
-      print(plot_grid(plotlist = plotlist, ncol = ncol_value))
-      dev.off()
+      plot <- plot_grid(plotlist = plotlist, ncol = ncol_value)
+      save_ggplot(plot, title = paste0(reduction, "_", group, "_All_Samples"), 
+                  folder = saving_directory,
+                  dpi = 300, width = 3000, height = 2000)
       
       i <- i + 1 # Incrementar el contador
     } # for loop over groups key
   } # for loop over reductions key
   
-  print("Merging Seurat List")
-  SeuratObject <- merge(x = SeuratList[[1]],
-                        y = SeuratList[2:length(SeuratList)],
-                        merge.data = TRUE, add.cell.ids = names(SeuratList))
-  
   
   if(save_intermediate_files){
     print("Saving Seurat List")
-    saveRDS(SeuratObject, file = file.path(saving_directory, "Processed_Seurat_List.rds"))
+    saveRDS(list_seurat, file = file.path(saving_directory, "Processed_Seurat_List.rds"))
     
-    rm(SeuratObject, i, num_samples, dimensions_report)
+    rm(list_seurat, i, num_samples, dimensions_report)
     gc()
-    SeuratObject <- readRDS(file = file.path(saving_directory, "Processed_Seurat_List.rds"))
+    list_seurat <- readRDS(file = file.path(saving_directory, "Processed_Seurat_List.rds"))
   }
   
+  print_centered_note("End Of The Standard Seurat Processing Pipeline ")
   
-  print(separator)
-  print("                 END OF THE STANDAR SEURAT PROCESSING PIPELINE                  ")
-  print(separator)
-  
-  return(SeuratObject)
+  return(list_seurat)
   
   } # Key of the function
