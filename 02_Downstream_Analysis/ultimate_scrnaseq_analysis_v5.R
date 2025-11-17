@@ -1,21 +1,112 @@
 ########## 04/02/2025 ##########
 
-# ========================================== #
-# AUTOMATE COMPLETE SCRNASEQ ANALYSIS SCRIPT #
-# ========================================== #
+#' @title Fully Automated scRNA-seq Processing Workflow (QC → Filtering → Seurat → Doublets → Integration → Clustering)
+#'
+#' @description
+#' This function performs a complete end-to-end **automated scRNA-seq analysis pipeline**
+#' starting from a list of raw Seurat objects.  
+#' It includes:
+#' quality control (QC), interactive filtering, standard Seurat preprocessing,
+#' optional doublet detection, optional Harmony integration, clustering, and
+#' clustering QC—saving all results to a structured analysis directory.
+#'
+#' All key steps are delegated to modular helper functions
+#' (automatic QC, standard Seurat processing, doublet detection, Harmony integration,
+#' clustering QC), making this function suitable as a high-level wrapper for
+#' fully reproducible scRNA-seq workflows.
+#'
+#' @param list_scr A named list of Seurat objects corresponding to different samples.
+#' These objects will be QC’d, filtered, processed, optionally doublet-filtered,
+#' optionally integrated, and clustered.
+#'
+#' @param where_to_save Directory where the full analysis folder will be created.
+#' If \code{NULL} (default), the current working directory is used.
+#'
+#' @param cell_cycle_analysis Logical.  
+#' If \code{TRUE} (default), performs cell-cycle scoring during QC and includes
+#' cell-cycle metrics in downstream clustering QC.
+#'
+#' @param title Character string used as a prefix for the main output directory
+#' (default: \code{"scRNAseq_Analysis"}).
+#'
+#' @param specie Character abbreviation for the species used in gene annotations
+#' (e.g., \code{"hsa"} or \code{"mmu"}).  
+#' Passed to QC and preprocessing helper functions.
+#'
+#' @param doublet_detection Logical.  
+#' If \code{TRUE} (default), runs automated doublet detection after Seurat preprocessing.
+#'
+#' @param integration Logical.  
+#' If \code{TRUE} (default), performs dataset integration using Harmony.
+#'
+#' @param save_intermediates_files Logical.  
+#' If \code{TRUE} (default), intermediate Seurat objects and reports are saved
+#' throughout the workflow.
+#'
+#' @details
+#' This wrapper function orchestrates the following analytical steps:
+#' \enumerate{
+#'   \item **Initial QC** via \code{automatic_qc_scrnaseq()}, generating metrics and plots.
+#'   \item **Interactive filtering** of low-quality cells, including:
+#'     \itemize{
+#'       \item nUMIs thresholds
+#'       \item nGenes thresholds
+#'       \item mitoRatio filtering
+#'       \item log10GenesPerUMI filtering (complexity)
+#'       \item automatic creation of filtering reports and Excel summaries
+#'     }
+#'   \item **Post-filter QC** to validate filtering decisions.
+#'   \item **Standard Seurat processing** via \code{automatic_standard_seurat()}:
+#'     normalization, variable features, scaling, PCA, UMAP, etc.
+#'   \item **Optional doublet detection** via \code{automatic_doublet_detection()}.
+#'   \item **Optional Harmony integration** across samples via
+#'     \code{harmony_automate_integration()}.
+#'   \item **Clustering and clustering QC** via \code{clustering_scrnaseq()}:
+#'         multi-resolution clustering, UMAPs, barplots, feature plots, clustree,
+#'         combined QC figures, and reports.
+#'   \item Automatic directory and file structure via \code{create_sequential_dir()}.
+#' }
+#'
+#' The function creates a master directory containing:
+#' \itemize{
+#'   \item QC reports (raw + filtered)
+#'   \item filtering logs and Excel summaries
+#'   \item Seurat preprocessing outputs
+#'   \item doublet detection results
+#'   \item Harmony integration figures
+#'   \item clustering QC reports
+#'   \item final integrated and clustered Seurat object
+#' }
+#'
+#' @return
+#' A fully processed Seurat object after QC, filtering, preprocessing,
+#' optional doublet detection, optional integration, and clustering.  
+#' All intermediate results and figures are saved to the output directory.
+#'
+#' @seealso
+#' \code{\link{automatic_qc_scrnaseq}},  
+#' \code{\link{automatic_standard_seurat}},  
+#' \code{\link{automatic_doublet_detection}},  
+#' \code{\link{harmony_automate_integration}},  
+#' \code{\link{clustering_scrnaseq}},  
+#' \code{\link[Seurat]{Seurat}}
+#'
+#' @examples
+#' \dontrun{
+#' final_obj <- automatic_scrnaseq_analysis(
+#'     list_scr = list(sample1 = seurat1, sample2 = seurat2),
+#'     where_to_save = "analysis_results/",
+#'     title = "MyProject",
+#'     specie = "hsa",
+#'     doublet_detection = TRUE,
+#'     integration = TRUE,
+#'     cell_cycle_analysis = TRUE,
+#'     save_intermediates_files = TRUE
+#' )
+#' }
+#'
+#' @export
 
-# This scripts will host the new automate scRNAseq function that will be used from scratch, improving the
-# code, make the function more efficient and easy to read. 
-
-# The main difference with the previous script is in this new function, only will be passed one scRNA-seq
-# that contains the experiment I want to analyze, not a list of scRNA-seq, so it can be used with lapply
-# to analyze multiple scRNA-seq experiments at onece. 
-
-# I'm not going to introduce the cell cycle analysis at begining, but I hope that in later upgrates of the
-# function will be added. Also this function will create new and better visualizations, and a better performance
-# in saving results, figures and so.
-
-# The same as above with the integration step that will be performed, at firts, out of the function.
 
 automatic_scrnaseq_analysis <- function(list_scr, 
                                         where_to_save = NULL,
