@@ -314,8 +314,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
                                       where_to_save = main_directory, 
                                       save_intermediates = save_intermediates_files, 
                                       cell_cycle_analysis = cell_cycle_analysis)
-  end <- Sys.time()
-  execution_time <- end - start
+  
   print_centered_note("End of the complete scRNA-seq Analysis")
   return(SeuratObject)
 } # Key for the end of the function
