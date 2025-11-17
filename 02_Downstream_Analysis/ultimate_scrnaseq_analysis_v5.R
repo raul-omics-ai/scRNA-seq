@@ -29,9 +29,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
   # =================================================================================== #
   # ==== BLOCK 1: LOADING LIBRARIES, CUSTOM FUNCTIONS AND CREATING NEW DIRECTORIES ====
   # =================================================================================== #   
-  # installing packages 
-  start <- Sys.time()
-
+  # installing package
   print('Setting Up Directory and Loading Packages')
   list.of.packages = c('ggplot2', 'Seurat', 'SeuratObject','openxlsx', 'parallel', 
                        'DoubletFinder', 'harmony', 'dplyr', 'cowplot', "patchwork")
@@ -47,7 +45,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
   source("~/Documentos/09_scripts_R/automate_standard_seurat_processing.R")
   source("~/Documentos/09_scripts_R/automatic_doublet_detection.R")
   source("~/Documentos/09_scripts_R/harmony_automate_integration.R")
-  source("~/Documentos/09_scripts_R/automatic_clustering_scrnaseq_v1.R")
+  source("~/Documentos/09_scripts_R/automatic_clustering_scrnaseq.R")
   
   source("~/Documentos/09_scripts_R/print_centered_note_v1.R")
   source("~/Documentos/09_scripts_R/automate_saving_dataframes_xlsx_format.R")
@@ -209,20 +207,24 @@ automatic_scrnaseq_analysis <- function(list_scr,
                                                 save_intermediates = save_intermediates_files)
   }
   
-  
-  # BLOCK 5: INTEGRATION STUTDY ====
+  # ===================================== #
+  # ==== BLOCK 5: INTEGRATION STUTDY ====
+  # ===================================== #
   if(integration){
     SeuratObject <- harmony_automate_integration(list_seurat = list_scr, 
                                                  where_to_save = main_directory, 
                                                  save_intermediates = save_intermediates_files)
   }
   
-  
-  # BLOCK 6: CLUSTERING AND CLUSTERING QC
+  # =============================================== #
+  # ==== BLOCK 6: CLUSTERING AND CLUSTERING QC ====
+  # =============================================== #
   SeuratObject <- clustering_scrnaseq(SeuratObject = SeuratObject, 
-                                      where_to_save = file.path(main_directory), 
+                                      where_to_save = main_directory, 
                                       save_intermediates = save_intermediates_files, 
-                                      cell_cycle_analysis =cell_cycle_analysis)
+                                      cell_cycle_analysis = cell_cycle_analysis)
+  end <- Sys.time()
+  execution_time <- end - start
+  print_centered_note(paste0("Execution time: ", execution_time, " s"))
   return(SeuratObject)
-  
 } # Key for the end of the function
