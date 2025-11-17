@@ -112,7 +112,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
                                         where_to_save = NULL,
                                         cell_cycle_analysis = TRUE, 
                                         title = "scRNAseq_Analysis", 
-                                        specie = "hsa",
+                                        sp = "hsa",
                                         doublet_detection = TRUE,
                                         integration = TRUE, 
                                         save_intermediates_files = TRUE){
@@ -155,7 +155,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
   # ========================================== #
   list_scr <- automatic_qc_scrnaseq(list_srn = list_scr, 
                                     where_to_save = main_directory, 
-                                    specie = specie)
+                                    specie = sp)
   
   # ============================================= #
   # === BLOCK 3: LOW QUALITY CELLS FILTERING ====
@@ -279,7 +279,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
   # QC of the filtered data
   list_scr <- automatic_qc_scrnaseq(list_srn = list_scr, 
                                     where_to_save = filtering_dir,
-                                   specie = specie)
+                                   specie = sp)
 
   # =========================================== #
   # ==== BLOCK 3: STANDARD SEURAT PIPELINE ====
@@ -287,7 +287,7 @@ automatic_scrnaseq_analysis <- function(list_scr,
   list_scr <- automatic_standard_seurat(list_seurat = list_scr, 
                                             where_to_save = main_directory, 
                                             save_intermediate_files = save_intermediates_files,
-                                            specie = specie,
+                                            specie = sp,
                                             cell_cycle_analysis = cell_cycle_analysis)
   # ==================================== #
   # ==== BLOCK 4: DOUBLET DETECTION ====
