@@ -166,7 +166,7 @@ harmony_automate_integration <- function(list_seurat,
        dims_to_int)
     gc()
     
-    SeuratObject <- readRDS(file = file.path(output_dir, "Seurat_Integrado.rds"))
+    SeuratObject <- readRDS(file = file.path(output_dir, "Integrated_Seurat.rds"))
   }
   
   print_centered_note("End Of The Integration Step")
