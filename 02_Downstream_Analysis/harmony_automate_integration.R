@@ -2,33 +2,44 @@
 
 ## Script automatizado para el análisis de integración con harmony de un objeto Seurat:
 
-harmony_automate_integration <- function(SeuratObject, where_to_save = NULL, save_intermediates = T) {
-  # BLOCK 1: PREPARING WORKING DIRECTORY ==== 
-  print('Instalando los paquetes necesarios para el análisis...')
-  list.of.packages = c('ggplot2', 'Seurat', 'SeuratObject','openxlsx', 'parallel', 
-                       'DoubletFinder', 'harmony', 'dplyr', 'cowplot', "patchwork")
+harmony_automate_integration <- function(list_seurat, 
+                                         where_to_save = NULL, 
+                                         save_intermediates = T) {
+
+  # ============================= #
+  # ==== BLOCK 1: Setting Up ====
+  # ============================= #
+  list.of.packages = c('ggplot2','openxlsx', 'parallel', 
+                       'harmony', 'dplyr', 'cowplot', "patchwork")
   
   new.packages = list.of.packages[!(list.of.packages %in% installed.packages())]
   if(length(new.packages) > 0) install.packages(new.packages)
   
   invisible(lapply(list.of.packages, FUN = library, character.only = T))
   rm(list.of.packages, new.packages)
-  print("Setting Up the Working Directory")
-  if (is.null(where_to_save)) {
-    where_to_save <- getwd()
-  }
-  output_dir <- file.path(where_to_save, paste0("05_INTEGRATION"))
-  dir.create(output_dir, recursive = TRUE)
+
+  # custom functions
+  source("~/Documentos/09_scripts_R/create_sequential_dir.R")
+  source("~/Documentos/09_scripts_R/automate_saving_dataframes_xlsx_format.R")
+  source("~/Documentos/09_scripts_R/Automate_Saving_ggplots.R")
+  source("~/Documentos/09_scripts_R/print_centered_note_v1.R")
+
+  # working directory
+  where_to_save <- ifelse(is.null(where_to_save), getwd(), where_to_save)
   
-  # header
-  separator <- paste0(rep("-", 80), collapse = "")
-  cat("\n")
-  print(separator)
-  print("                          STARTING INTEGRATION STUDIES                          ")
-  print(separator) 
+  output_dir <- create_sequential_dir(path = where_to_save, name = "Harmony_Integration")
+
+  # ====================================== #
+  # ==== BLOCK 2: Harmony Integration ====
+  # ====================================== #
+  set.seed(123)
+  print_centered_note("Starting Integration Studies ")
+
+  print("Merging Seurat Object")
+  SeuratObject <- merge(x = list_seurat[[1]],
+                        y = list_seurat[2:length(list_seurat)],
+                        merge.data = TRUE, add.cell.ids = names(list_seurat))
   
-  # BLOCK 2: PROCESSING MERGED SEURAT OBJECT ====
-  print("Processing merged Seurat Object")
   SeuratObject <- SeuratObject %>%
     NormalizeData() %>%
     FindVariableFeatures(selection.method = "vst", nfeatures = 2000, verbose = FALSE) %>% 
@@ -54,8 +65,11 @@ harmony_automate_integration <- function(SeuratObject, where_to_save = NULL, sav
   
   dims_to_int <- pcs
   SeuratObject <- RunUMAP(SeuratObject, dims = 1:dims_to_int)
+
+  # ========================================= #
+  # ==== BLOCK 3: PREINTEGRATION STUDIES ====
+  # ========================================= #
   
-  # BLOCK 3: PREINTEGRATION STUDIES ====
   preintegration_dimplot <- DimPlot(SeuratObject, reduction = "umap", group.by = "orig.ident") + 
     ggtitle("PreIntegration") +
     theme(legend.position = "bottom", legend.direction = "horizontal")
@@ -79,25 +93,23 @@ harmony_automate_integration <- function(SeuratObject, where_to_save = NULL, sav
   postintegration_dimplot <- DimPlot(SeuratObject, group.by = "orig.ident", reduction = "umap") + 
           ggtitle("PostIntegration") + NoLegend()
   
-  integrated_umap_path <- file.path(output_dir, "01_Integration_Dimplots.png")
+  figure <- preintegration_dimplot | postintegration_dimplot
+  figure <- figure + plot_annotation(tag_levels = "A")
   
-  png(integrated_umap_path, res = 300, width = 3000, height = 2000)
-  print(preintegration_dimplot | postintegration_dimplot)
-  dev.off()
+  save_ggplot(plot = figure, title = "Integration_Dimplot", 
+              folder = output_dir, height = 2000, width = 3000)
   
   if(save_intermediates){
     print("Saving Integrated Seurat Object")
-    saveRDS(SeuratObject, file = file.path(output_dir, "Seurat_Integrado.rds"))
+    saveRDS(SeuratObject, file = file.path(output_dir, "Integrated_Seurat.rds"))
     
-    rm(SeuratObject, postintegration_dimplot, integrated_umap_path, preintegration_dimplot,
-       dims_to_int, elbow_plot_path)
+    rm(SeuratObject, postintegration_dimplot, preintegration_dimplot,
+       dims_to_int)
     gc()
     
     SeuratObject <- readRDS(file = file.path(output_dir, "Seurat_Integrado.rds"))
   }
-  cat("\n")
-  print(separator)
-  print("                            END OF INTEGRATION STEP                             ")
-  print(separator)
+  
+  print_centered_note("End Of The Integration Step")
   return(SeuratObject)
 }
