@@ -97,7 +97,7 @@
 #'     list_scr = list(sample1 = seurat1, sample2 = seurat2),
 #'     where_to_save = "analysis_results/",
 #'     title = "MyProject",
-#'     specie = "hsa",
+#'     sp = "hsa",
 #'     doublet_detection = TRUE,
 #'     integration = TRUE,
 #'     cell_cycle_analysis = TRUE,
@@ -316,6 +316,6 @@ automatic_scrnaseq_analysis <- function(list_scr,
                                       cell_cycle_analysis = cell_cycle_analysis)
   end <- Sys.time()
   execution_time <- end - start
-  print_centered_note(paste0("Execution time: ", execution_time, " s"))
+  print_centered_note("End of the complete scRNA-seq Analysis")
   return(SeuratObject)
 } # Key for the end of the function
