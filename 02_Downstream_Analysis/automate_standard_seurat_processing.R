@@ -151,9 +151,7 @@ automatic_standard_seurat <- function(SeuratObject,
   # ========================================================== #
   # ==== BLOCK 2: Split Each Biological Sample To Analyze ====
   # ========================================================== #
-  print_centered_note("Starting standard seurat processing")  separator <- paste0(rep("-", 80), collapse = "")
-  
-  rint_centered_note("Starting standard seurat processing")
+  print_centered_note("Starting standard seurat processing")
   
   list_seurat <- lapply(list_seurat, function(x){NormalizeData(x)})
   print('NormalizeData OK')
