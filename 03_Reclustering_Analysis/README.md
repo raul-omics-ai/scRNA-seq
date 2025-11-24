@@ -24,7 +24,7 @@ and may contain **multiple cellular subtypes**.
 ✅   Extensive QC and clustering visualizations\
 ✅   Structured output folder system\
 ✅   Automatic saving of all plots and the reclustered Seurat object\
-✅   Designed for reproducibility\
+✅   Designed for reproducibility
 
 ## 📂 Directory Structure
 
@@ -35,6 +35,7 @@ and may contain **multiple cellular subtypes**.
     ├── Clustering_Res_0.3/
     ├── Clustering_Res_0.5/
     ├── Clustering_Res_0.7/
+    ├── Clustering_Res_1/
     ├── 01_Reclustering_Dimensionality_Reduction.png
     ├── 06_Clustree_Report.png
     └── Reclustered_<cluster_name>.rds
