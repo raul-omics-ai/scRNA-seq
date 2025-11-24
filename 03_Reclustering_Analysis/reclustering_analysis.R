@@ -328,7 +328,7 @@ reclustering_function <- function(seurat_object,
               width = 6000, height = 5000)
   
   print_centered_note("Saving Reclustered Seurat Object ")
-  saveRDS(recluster_object, 
+  saveRDS(reclustering_object, 
           file = file.path(saving_directory, paste0("Reclustered_", cluster_to_reanalyze, ".rds")))
   cat("\nReclustered Object Saved\n")
   
