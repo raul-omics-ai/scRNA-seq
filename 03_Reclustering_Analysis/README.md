@@ -18,13 +18,13 @@ and may contain **multiple cellular subtypes**.
 
 ✅   Automatic extraction and processing of the selected cluster\
 ✅   Full Seurat workflow: normalization → HVGs → scaling → PCA → UMAP →
-    tSNE
-✅   Optimal PC estimation
-✅   Clustering at multiple resolutions
-✅   Extensive QC and clustering visualizations
-✅   Structured output folder system
-✅   Automatic saving of all plots and the reclustered Seurat object
-✅   Designed for reproducibility
+    tSNE\
+✅   Optimal PC estimation\
+✅   Clustering at multiple resolutions\
+✅   Extensive QC and clustering visualizations\
+✅   Structured output folder system\
+✅   Automatic saving of all plots and the reclustered Seurat object\
+✅   Designed for reproducibility\
 
 ## 📂 Directory Structure
 
