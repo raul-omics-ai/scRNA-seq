@@ -1,11 +1,54 @@
 ########## 24/11/2025 ##########
 
-# ======================================== #
-# ==== Marker identification function ====
-# ======================================== #
-
-# Esta función lo que pretende es crear visualizaciones acerca de los marcadores de cada uno de los clusters
-# para poder tomar la decisión de anotar el tipo celular que se corresponda
+#' Plot Marker Genes for Seurat Clusters
+#'
+#' This function identifies marker genes for each cluster within a Seurat object
+#' and generates several visualizations (DimPlot, DotPlot, ViolinPlot), combining them into
+#' a single figure. It also exports a sorted marker table and automatically saves all
+#' generated outputs in a sequential directory.
+#'
+#' @description
+#' The function computes positive markers for each cluster using \code{FindAllMarkers},
+#' extracts the top markers, and generates publication-ready plots to assist in deciding the
+#' appropriate cell type annotation for each cluster.
+#'
+#' Several helper functions are sourced internally:
+#'  - \code{print_centered_note()}
+#'  - \code{create_sequential_dir()}
+#'  - \code{save_ggplot()}
+#'  - \code{save_dataframe()}
+#'
+#' These must be available in the user's environment.
+#'
+#' @param SeuratObject A valid Seurat object containing clustering results.
+#' @param where_to_save Character string specifying the directory in which results will be saved.
+#'   If \code{NULL}, the current working directory is used. Defaults to \code{NULL}.
+#' @param title A character string defining the name of the main output directory.
+#'   Defaults to \code{"Plot_Seurat_Markers"}.
+#' @param width Numeric. Width of the combined marker plot when saved. Defaults to \code{6000}.
+#' @param height Numeric. Height of the combined marker plot when saved. Defaults to \code{4000}.
+#'
+#' @return
+#' The function invisibly returns the path to the directory where all outputs were saved.
+#' In addition, it writes:
+#'  - An Excel file with sorted cluster markers.
+#'  - A combined figure with DimPlot, DotPlot, and ViolinPlot.
+#'
+#' @details
+#' The function automatically installs missing packages, loads required dependencies,
+#' finds all positive markers, extracts the top two genes per cluster, creates visualizations,
+#' and saves all outputs in a structured directory.
+#'
+#' @examples
+#' \dontrun{
+#' plot_markers_function(
+#'   SeuratObject = my_seurat,
+#'   where_to_save = "~/results",
+#'   title = "My_Marker_Plots"
+#' )
+#' }
+#'
+#' @export
 
 plot_markers_function <- function(SeuratObject, 
                                   where_to_save = NULL,
