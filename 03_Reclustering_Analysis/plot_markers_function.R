@@ -109,15 +109,25 @@ plot_markers_function <- function(SeuratObject,
   # ==== BLOCK 3: Visualizations ====
   # ================================= #
   print_centered_note("Creating the Figure of the Markers ")
+  individual_plots_dir <- create_sequential_dir(path = saving_directory, 
+                                                name = "Individual_Plots")
+  
   cat("\nDimPlot\n")
   dimplot <- DimPlot(SeuratObject, label = T, repel = T,
                      pt.size = 8,   label.size = 8) + NoLegend()
+  save_ggplot(dimplot, title = "Dimplot", 
+              folder = individual_plots_dir, width = 3000, height = 2000)
   
   cat("\nDotPlot\n")
   dotplot <- DotPlot(object = SeuratObject, features = top2_genes)
+
+  save_ggplot(dotplot, title = "Dotplot_Markers", 
+              folder = individual_plots_dir, width = 3000, height = 2000)
   
   cat("\nViolinPlot\n")
   violinplot <- VlnPlot(SeuratObject, features = top2_genes)
+  save_ggplot(violinplot, title = "ViolinPlot_Markers", 
+              folder = individual_plots_dir, width = width, height = height) 
   
   cat("\nCombining Plots\n")
   combined <- (dotplot / violinplot) | dimplot
